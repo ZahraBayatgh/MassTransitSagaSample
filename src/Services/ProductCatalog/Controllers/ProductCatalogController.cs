@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using ProductCatalog.Dtos;
+using ProductCatalogService.Dtos;
 using ProductCatalogService.Services;
 using System.Threading.Tasks;
 

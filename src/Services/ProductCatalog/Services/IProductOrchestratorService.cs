@@ -1,5 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
-using ProductCatalog.Dtos;
+using ProductCatalogService.Dtos;
 using System.Threading.Tasks;
 
 namespace ProductCatalogService.Services

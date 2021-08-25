@@ -5,7 +5,7 @@ using MassTransit;
 using MassTransit.Util;
 using Microsoft.Extensions.Logging;
 using ProductCatalog.Data;
-using ProductCatalog.Dtos;
+using ProductCatalogService.Dtos;
 using System;
 using System.Threading.Tasks;
 

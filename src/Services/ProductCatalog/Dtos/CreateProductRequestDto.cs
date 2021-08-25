@@ -1,4 +1,4 @@
-﻿namespace ProductCatalog.Dtos
+﻿namespace ProductCatalogService.Dtos
 {
     public class CreateProductRequestDto
     {

@@ -1,15 +1,16 @@
 using Autofac.Extensions.DependencyInjection;
-using MassTransit;
 using MassTransit.Util;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
-using ProductCatalogService.Consumers;
-using ProductCatalogService.Data;
+using SalesService.Data;
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using MassTransit;
+using SalesService.Consumers;
+using SalesService.Services;
 
-namespace ProductCatalog
+namespace SalesService
 {
     public class Program
     {
@@ -30,3 +31,4 @@ namespace ProductCatalog
             });
     }
 }
+

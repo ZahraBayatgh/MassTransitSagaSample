@@ -1,4 +1,3 @@
-using Autofac;
 using MassTransit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -6,15 +5,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
-using ProductCatalog.Data;
-using ProductCatalogService.Consumers;
-using ProductCatalogService.Services;
-using RabbitMQ.Client;
-using System.Reflection;
+using SalesService.Consumers;
+using SalesService.Data;
+using SalesService.Services;
 
-namespace ProductCatalog
+namespace SalesService
 {
     public class Startup
     {
@@ -25,55 +21,57 @@ namespace ProductCatalog
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<ProductCatalogDbContext>(options =>
-             options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddDbContext<SaleDbContext>(options =>
+            options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             services.AddMassTransit(x =>
             {
-                x.AddConsumer<CheckSalesProductAddedConsumer>();
-                x.AddConsumer<CheckInventoryProductAddedConsumer>();
+                x.AddConsumer<CreateSalesProductConsumer>();
 
                 x.UsingRabbitMq((context, cfg) =>
                 {
-                    cfg.ReceiveEndpoint("sagas-demo-product-catalog", e =>
+                    cfg.ReceiveEndpoint("sagas-demo-sale", e =>
                     {
-                        e.ConfigureConsumer<CheckSalesProductAddedConsumer>(context);
-                        e.ConfigureConsumer<CheckInventoryProductAddedConsumer>(context);
+                        e.ConfigureConsumer<CreateSalesProductConsumer>(context);
                     });
                 });
             });
 
             services.AddMassTransitHostedService();
             services.AddScoped<IProductService, ProductService>();
-            services.AddScoped<IProductOrchestratorService, ProductOrchestratorService>();
-
-            services.AddControllers();
+            services.AddControllers(options =>
+            {
+                options.SuppressAsyncSuffixInActionNames = false;
+            });
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "ProductCatalog", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Sale api", Version = "v1" });
             });
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "ProductCatalog v1"));
             }
 
             app.UseRouting();
-
             app.UseAuthorization();
+
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+            });
+
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
             });
+
         }
     }
 
