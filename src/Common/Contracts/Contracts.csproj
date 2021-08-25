@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+	<ItemGroup>
+
+		<PackageReference Include="MassTransit.Analyzers" Version="7.2.2" />
+		<PackageReference Include="Common.Logging.NLog41" Version="3.4.1" />
+		<PackageReference Include="MassTransit.AspNetCore" Version="7.2.2" />
+		<PackageReference Include="MassTransit" Version="7.2.2" />
+		<PackageReference Include="MassTransit.RabbitMQ" Version="7.2.2" />
+		<PackageReference Include="MassTransit.RedisSagas" Version="6.3.2.88" />
+
+	</ItemGroup>
+</Project>
