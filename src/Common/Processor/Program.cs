@@ -6,7 +6,15 @@ namespace Processor
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            Console.WriteLine("Starting orden processor");
+
+            var service = new ProcessorService();
+            service.Start();
+
+            Console.WriteLine("Press any key to close...");
+            Console.ReadKey();
+
+            service.Stop();
         }
     }
 }
