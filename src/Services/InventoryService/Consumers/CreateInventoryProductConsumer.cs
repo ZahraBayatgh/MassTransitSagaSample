@@ -54,13 +54,15 @@ namespace ProductCatalogService.Consumers
                     // Add InventoryTransaction
                     var inventoryTransactionResponse = await _inventoryTransactionService.CreateInventoryTransactionAsync(InventoryTransactionDto);
 
-                     createProductStatus = createProductResponce.IsSuccess ? true : false;
+                    createProductStatus = createProductResponce.IsSuccess ? true : false;
+                    context.Message.Product.ProductStatus = ProductStatus.InventoryIsOk;
+
                 }
                 else
                 {
-                    context.Message.Product.ProductStatus = ProductStatus.Pending;
+                    context.Message.Product.ProductStatus = ProductStatus.Failed;
                 }
-                    await PublishResult(context, createProductStatus);
+                await PublishResult(context, createProductStatus);
                 transaction.Commit();
 
             }
@@ -72,7 +74,7 @@ namespace ProductCatalogService.Consumers
             catch (Exception ex)
             {
                 _logger.LogInformation($"SalesResultIntegrationEvent with {context.Message.Product.ProductId} product id failed. Exception detail:{ex.Message}");
-                    transaction.Rollback();
+                transaction.Rollback();
 
                 throw;
             }

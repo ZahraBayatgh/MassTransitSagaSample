@@ -32,12 +32,13 @@ namespace Service2
 
                 x.UsingRabbitMq((context, cfg) =>
                 {
-                    cfg.ReceiveEndpoint("sagas-demo-product-catalog", e =>
+                    cfg.ReceiveEndpoint("sagas-demo-inventory", e =>
                     {
                         e.ConfigureConsumer<CreateInventoryProductConsumer>(context);
                     });
                 });
             });
+            services.AddMassTransitHostedService();
 
             services.AddScoped<IProductService, ProductService>();
             services.AddScoped<IInventoryTransactionService, InventoryTransactionService>();

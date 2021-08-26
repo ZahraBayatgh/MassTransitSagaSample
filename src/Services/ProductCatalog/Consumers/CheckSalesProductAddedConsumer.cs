@@ -25,6 +25,7 @@ namespace ProductCatalogService.Consumers
             _context = context;
             _productService = productService;
         }
+
         public async Task Consume(ConsumeContext<ISalesProductAdded> context)
         {
             using var transaction = _context.Database.BeginTransaction();
@@ -36,20 +37,19 @@ namespace ProductCatalogService.Consumers
                 // Get and Check product in db
                 var getProduct = await _productService.GetProductByIdAsync(context.Message.Product.ProductId);
 
-                if (context.Message.Product.ProductStatus == ProductStatus.SalesIsOk)
+                if (getProduct.IsSuccess && context.Message.Product.ProductStatus == ProductStatus.SalesIsOk)
                 {
                     var productStatus = (int)ProductStatus.SalesIsOk + (int)getProduct.Value.ProductStatus;
                     UpdateProductStatusRequestDto updateProductStatusRequestDto = new UpdateProductStatusRequestDto(getProduct.Value.Name, productStatus);
 
                     await _productService.UpdateProductStatusAsync(updateProductStatusRequestDto);
-                    context.Message.Product.ProductStatus = ProductStatus.SalesIsOk;
+                     context.Message.Product.ProductStatus = ProductStatus.SalesIsOk;
                 }
-                else
+                else if (getProduct.IsSuccess && context.Message.Product.ProductStatus == ProductStatus.Pending)
                 {
                     // Delete product
                     await _productService.DeleteProductAsync(getProduct.Value.Id);
-                    context.Message.Product.ProductStatus = ProductStatus.Pending;
-
+                    context.Message.Product.ProductStatus = ProductStatus.Failed;
                 }
 
 

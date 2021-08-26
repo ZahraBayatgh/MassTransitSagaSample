@@ -18,45 +18,40 @@ namespace Contracts.StateMachines
             logger = LogManager.GetLogger<ProductCatalogStateMachine>();
 
             InstanceState(x => x.CurrentState);
-            State(() => Processing);
+            State(() => Pending);
             ConfigureCorrelationIds();
+            
             Initially(SetProductCatalogAddedHandler());
-            During(Processing, SetSalesProductAddedHandler(),  SetInventoryAddedHandler(), SetProductCatalogProcessedHandler());
+            During(SalesSubmited, SetSalesProductAddedHandler(),  SetInventoryAddedHandler());
 
             SetCompletedWhenFinalized();
 
         }
         private EventActivityBinder<ProductCatalogState, IProductCatalogAdded> SetProductCatalogAddedHandler() =>
-          When(ProductCatalogAdded).Then(c => UpdateSagaState(c.Instance, c.Data.Product))
-                              .Then(c => logger.Info($"Product Catalog Added to {c.Data.CorrelationId} received"))
-                              .ThenAsync(c => SendCommand<ICreateSalesProduct>("rabbitmq://localhost/sagas-demo-sale", c))
-                              .TransitionTo(Processing);
+            When(ProductCatalogAdded).Then(c => UpdateSagaState(c.Instance, c.Data.Product))
+                                  .Then(c => logger.Info($"Product Catalog Added to {c.Data.CorrelationId} received"))
+                                    .ThenAsync(c => this.SendCommand<ICreateSalesProduct>("rabbitmq://localhost/sagas-demo-sale", c))
+                                      .TransitionTo(SalesSubmited);
+                                    
 
-        private EventActivityBinder<ProductCatalogState, ISalesProductAdded> SetSalesProductAddedHandler()=>
-         When(SalesProductAdded).Then(c => this.UpdateSagaState(c.Instance, c.Data.Product))
-                                 .Then(c => this.logger.Info($"Inventory Product Added to {c.Data.CorrelationId} received"))
-                                .ThenAsync(c => this.SendCommand<ICreateInventoryProduct>("rabbitmq://localhost/sagas-demo-inventory", c))
-                                .TransitionTo(Processing);
-
-        private EventActivityBinder<ProductCatalogState, IInventoryProductAdded> SetInventoryAddedHandler() =>
-        When(InventoryProductAdded).Then(c => this.UpdateSagaState(c.Instance, c.Data.Product))
-                                .Then(c => this.logger.Info($"Inventory Product Added to {c.Data.CorrelationId} received"))
-                               .ThenAsync(c => this.SendCommand<ICreateInventoryProduct>("rabbitmq://localhost/sagas-demo-inventory", c))
-                               .TransitionTo(Processing);
-        private EventActivityBinder<ProductCatalogState, IProductCatalogProcessed> SetProductCatalogProcessedHandler() =>
-           When(ProductCatalogProcessed).Then(c =>
-           {
-               this.UpdateSagaState(c.Instance, c.Data.Product);
-           })
-                             .Publish(c => new ProductCatalogProcessed(c.Data.CorrelationId, c.Data.Product))
-                             .Finalize();
+        private EventActivityBinder<ProductCatalogState, ISalesProductAdded> SetSalesProductAddedHandler() =>
+           When(SalesProductAdded).Then(c => this.UpdateSagaState(c.Instance, c.Data.Product))
+                                      .Then(c => this.logger.Info($"Sales Product Added to {c.Data.CorrelationId} received"))
+                                        .ThenAsync(c => this.SendCommand<ICreateInventoryProduct>("rabbitmq://localhost/sagas-demo-inventory", c))
+                                     .TransitionTo(InventorySubmited);
+        private EventActivityBinder<ProductCatalogState, IInventoryProductAdded> SetInventoryAddedHandler()=>
+          When(InventoryProductAdded).Then(c => this.UpdateSagaState(c.Instance, c.Data.Product))
+                                  .Then(c => this.logger.Info($"Inventory Product Added to {c.Data.CorrelationId} received"))
+                                  .TransitionTo(Completed)
+                                   .Finalize(); 
+    
         private void ConfigureCorrelationIds()
         {
             Event(() => ProductCatalogAdded, x => x.CorrelateById(c => c.Message.CorrelationId).SelectId(c => c.Message.CorrelationId));
             Event(() => SalesProductAdded, x => x.CorrelateById(c => c.Message.CorrelationId).SelectId(c => c.Message.CorrelationId));
             Event(() => InventoryProductAdded, x => x.CorrelateById(c => c.Message.CorrelationId).SelectId(c => c.Message.CorrelationId));
             Event(() => ProductCatalogProcessed, x => x.CorrelateById(c => c.Message.CorrelationId).SelectId(c => c.Message.CorrelationId));
-            
+
         }
         private void UpdateSagaState(ProductCatalogState state, ProductDto productDto)
         {
@@ -79,7 +74,10 @@ namespace Contracts.StateMachines
         public Event<ISalesProductAdded> SalesProductAdded { get; private set; }
         public Event<IInventoryProductAdded> InventoryProductAdded { get; private set; }
         public Event<IProductCatalogProcessed> ProductCatalogProcessed { get; private set; }
-        
-        public SagaState Processing { get; private set; }
+
+        public SagaState Pending { get; private set; }
+        public SagaState SalesSubmited { get; private set; }
+        public SagaState InventorySubmited { get; private set; }
+        public SagaState Completed { get; private set; }
     }
 }

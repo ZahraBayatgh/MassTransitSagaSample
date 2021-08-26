@@ -12,7 +12,7 @@ namespace Contracts.StateMachines
             CorrelationId = correlationId;
             Product = new ProductDto();
         }
-        public string CurrentState { get; set; }
+        public State CurrentState { get; set; }
 
         public Guid CorrelationId { get; set; }
         public ProductDto Product { get; set; }

@@ -30,32 +30,26 @@ namespace ProductCatalogService.Consumers
             using var transaction = _context.Database.BeginTransaction();
             try
             {
-                // Check SalesProductAddContext
+               // Check SalesProductAddContext
                 CheckSalesProductAddContext(context);
 
-                // Get and Check product in db
-                var getProduct = await _productService.GetProductByIdAsync(context.Message.Product.ProductId);
+               // Get and Check product in db
+               var getProduct = await _productService.GetProductByIdAsync(context.Message.Product.ProductId);
 
-                if (context.Message.Product.ProductStatus == ProductStatus.SalesIsOk)
+                if (getProduct.IsSuccess && context.Message.Product.ProductStatus == ProductStatus.InventoryIsOk)
                 {
                     var productStatus = (int)ProductStatus.InventoryIsOk + (int)getProduct.Value.ProductStatus;
                     UpdateProductStatusRequestDto updateProductStatusRequestDto = new UpdateProductStatusRequestDto(getProduct.Value.Name, productStatus);
 
                     await _productService.UpdateProductStatusAsync(updateProductStatusRequestDto);
-                    context.Message.Product.ProductStatus = ProductStatus.SalesIsOk;
+                    context.Message.Product.ProductStatus = ProductStatus.Completed;
                 }
-                else
+                else if (getProduct.Value!=null && context.Message.Product.ProductStatus == ProductStatus.Failed)
                 {
-                    // Delete product
+                   // Delete product
                     await _productService.DeleteProductAsync(getProduct.Value.Id);
                     context.Message.Product.ProductStatus = ProductStatus.Failed;
                 }
-
-                await context.Publish<IProductCatalogProcessed>(new
-                {
-                    CorrelationId = context.Message.CorrelationId,
-                    Product = context.Message.Product
-                });
 
                 transaction.Commit();
 
