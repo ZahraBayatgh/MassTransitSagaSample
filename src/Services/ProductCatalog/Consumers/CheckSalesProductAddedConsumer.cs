@@ -52,12 +52,16 @@ namespace ProductCatalogService.Consumers
                     context.Message.Product.ProductStatus = ProductStatus.Failed;
                 }
 
-
-                await context.Publish<IInventoryProductAdded>(new
+                await context.Publish<ICreateInventoryProduct>(new
                 {
                     CorrelationId = context.Message.CorrelationId,
                     Product = context.Message.Product
                 });
+                //await context.Publish<IInventoryProductAdded>(new
+                //{
+                //    CorrelationId = context.Message.CorrelationId,
+                //    Product = context.Message.Product
+                //});
 
                 transaction.Commit();
 

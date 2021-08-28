@@ -36,7 +36,7 @@ namespace ProductCatalogService.Consumers
                // Get and Check product in db
                var getProduct = await _productService.GetProductByIdAsync(context.Message.Product.Id);
 
-                if (getProduct.IsSuccess && context.Message.Product.ProductStatus == ProductStatus.SalesIsOk)
+                if (getProduct.IsSuccess && context.Message.Product.ProductStatus == ProductStatus.InventoryIsOk)
                 {
                     var productStatus = (int)ProductStatus.InventoryIsOk + (int)getProduct.Value.ProductStatus;
                     UpdateProductStatusRequestDto updateProductStatusRequestDto = new UpdateProductStatusRequestDto(getProduct.Value.Name, productStatus);

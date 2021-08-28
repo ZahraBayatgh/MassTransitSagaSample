@@ -15,16 +15,24 @@ namespace Contracts.StateMachines
 
         public ProductCatalogStateMachine()
         {
-            logger = LogManager.GetLogger<ProductCatalogStateMachine>();
+            try
+            {
+                logger = LogManager.GetLogger<ProductCatalogStateMachine>();
 
-            InstanceState(x => x.CurrentState);
-            State(() => Pending);
-            ConfigureCorrelationIds();
-            
-            Initially(SetProductCatalogAddedHandler());
-            During(SalesSubmited, SetSalesProductAddedHandler(),  SetInventoryAddedHandler());
+                InstanceState(x => x.CurrentState);
+                State(() => Pending);
+                ConfigureCorrelationIds();
 
-            SetCompletedWhenFinalized();
+                Initially(SetProductCatalogAddedHandler());
+                During(SalesSubmited, SetSalesProductAddedHandler(), SetInventoryAddedHandler());
+
+                SetCompletedWhenFinalized();
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
 
         }
         private EventActivityBinder<ProductCatalogState, IProductCatalogAdded> SetProductCatalogAddedHandler() =>
@@ -32,13 +40,10 @@ namespace Contracts.StateMachines
                                   .Then(c => logger.Info($"Product Catalog Added to {c.Data.CorrelationId} received"))
                                     .ThenAsync(c => this.SendCommand<ICreateSalesProduct>("rabbitmq://localhost/sagas-demo-sale", c))
                                       .TransitionTo(SalesSubmited);
-                                     
-
 
         private EventActivityBinder<ProductCatalogState, ISalesProductAdded> SetSalesProductAddedHandler() =>
            When(SalesProductAdded).Then(c => this.UpdateSagaState(c.Instance, c.Data.Product))
                                       .Then(c => this.logger.Info($"Sales Product Added to {c.Data.CorrelationId} received"))
-                                        .ThenAsync(c => this.SendCommand<ICreateInventoryProduct>("rabbitmq://localhost/sagas-demo-inventory", c))
                                      .TransitionTo(InventorySubmited);
         private EventActivityBinder<ProductCatalogState, IInventoryProductAdded> SetInventoryAddedHandler()=>
           When(InventoryProductAdded).Then(c => this.UpdateSagaState(c.Instance, c.Data.Product))

@@ -2,13 +2,10 @@
 
 namespace InventoryService.Migrations
 {
-    public partial class ChangeInventoryTransaction : Migration
+    public partial class Init : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "Inventories");
-
             migrationBuilder.CreateTable(
                 name: "InventoryTransactions",
                 columns: table => new
@@ -16,13 +13,25 @@ namespace InventoryService.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ProductId = table.Column<int>(type: "int", nullable: false),
-                    Type = table.Column<int>(type: "int", nullable: false),
-                    ChangeCount = table.Column<int>(type: "int", nullable: false),
-                    CurrentCount = table.Column<int>(type: "int", nullable: false)
+                    InventoryTransactionType = table.Column<int>(type: "int", nullable: false),
+                    Count = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_InventoryTransactions", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Products",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Products", x => x.Id);
                 });
         }
 
@@ -31,20 +40,8 @@ namespace InventoryService.Migrations
             migrationBuilder.DropTable(
                 name: "InventoryTransactions");
 
-            migrationBuilder.CreateTable(
-                name: "Inventories",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Count = table.Column<int>(type: "int", nullable: false),
-                    ProductId = table.Column<int>(type: "int", nullable: false),
-                    Type = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Inventories", x => x.Id);
-                });
+            migrationBuilder.DropTable(
+                name: "Products");
         }
     }
 }

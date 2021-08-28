@@ -9,8 +9,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace InventoryService.Migrations
 {
     [DbContext(typeof(InventoryDbContext))]
-    [Migration("20210811063040_ChangeInventoryTransaction")]
-    partial class ChangeInventoryTransaction
+    [Migration("20210828071653_Init")]
+    partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -27,16 +27,13 @@ namespace InventoryService.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("ChangeCount")
+                    b.Property<int>("Count")
                         .HasColumnType("int");
 
-                    b.Property<int>("CurrentCount")
+                    b.Property<int>("InventoryTransactionType")
                         .HasColumnType("int");
 
                     b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Type")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -50,9 +47,6 @@ namespace InventoryService.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("Count")
-                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");

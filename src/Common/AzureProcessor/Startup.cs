@@ -35,7 +35,7 @@ namespace AzureProcessor
                 cfg.AddSagaStateMachine<ProductCatalogStateMachine, ProductCatalogState>(typeof(ProductCatalogStateMachineDefinition))
                     .EntityFrameworkRepository(r =>
                     {
-                        r.ConcurrencyMode = ConcurrencyMode.Pessimistic; // or use Optimistic, which requires RowVersion
+                       // r.ConcurrencyMode = ConcurrencyMode.Pessimistic; // or use Optimistic, which requires RowVersion
 
                        r.AddDbContext<DbContext, ProductCatalogDbContext>((provider, builder) =>
                         {
@@ -46,6 +46,7 @@ namespace AzureProcessor
                             });
                         });
                     });
+
                 cfg.UsingRabbitMq(ConfigureBus);
 
             });
