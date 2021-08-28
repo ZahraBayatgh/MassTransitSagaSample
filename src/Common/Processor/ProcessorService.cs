@@ -1,6 +1,7 @@
 ﻿using Common.Logging;
 using Contracts.StateMachines;
 using MassTransit;
+using MassTransit.DapperIntegration;
 using MassTransit.RabbitMqTransport;
 using MassTransit.Saga;
 using MassTransit.Util;
@@ -62,6 +63,7 @@ namespace Processor
         private ISagaRepository<ProductCatalogState> CreateRepository()
         {
             return new InMemorySagaRepository<ProductCatalogState>();
+            //return DapperSagaRepository<ProductCatalogState>.Create("Server=(localdb)\\MSSQLLocalDB;Database=SagaDb;Trusted_Connection=True;MultipleActiveResultSets=false");
         }
 
         public void Stop()

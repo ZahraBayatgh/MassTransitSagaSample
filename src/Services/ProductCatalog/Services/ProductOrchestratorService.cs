@@ -36,7 +36,7 @@ namespace ProductCatalogService.Services
                 {
                     ProductDto productDto = new ProductDto
                     {
-                        ProductId = createProductResponse.Value.ProductId,
+                        Id = createProductResponse.Value.ProductId,
                         InitialOnHand = createProductRequestDto.InitialHand,
                         ProductName = createProductRequestDto.Name,
                         ProductStatus = ProductStatus.Pending

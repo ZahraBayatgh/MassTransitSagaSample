@@ -73,7 +73,7 @@ namespace ProductCatalogService.Consumers
             }
             catch (Exception ex)
             {
-                _logger.LogInformation($"SalesResultIntegrationEvent with {context.Message.Product.ProductId} product id failed. Exception detail:{ex.Message}");
+                _logger.LogInformation($"SalesResultIntegrationEvent with {context.Message.Product.Id} product id failed. Exception detail:{ex.Message}");
                 transaction.Rollback();
 
                 throw;
@@ -92,7 +92,7 @@ namespace ProductCatalogService.Consumers
             if (context == null)
                 throw new ArgumentNullException("SalesProductAddedContext is null.");
 
-            if (context.Message.Product.ProductId <= 0)
+            if (context.Message.Product.Id <= 0)
                 throw new ArgumentNullException("SalesProductAddedContext ProductId is invalid.");
         }
     }

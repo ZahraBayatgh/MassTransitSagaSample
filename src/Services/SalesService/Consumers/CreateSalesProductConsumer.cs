@@ -72,7 +72,7 @@ namespace SalesService.Consumers
             if (context == null)
                 throw new ArgumentNullException("CreateSalesProduct is null.");
 
-            if (context.Message.Product.ProductId <= 0)
+            if (context.Message.Product.Id <= 0)
                 throw new ArgumentNullException("CreateSalesProduct ProductId is invalid.");
 
             if (string.IsNullOrEmpty(context.Message.Product.ProductName))

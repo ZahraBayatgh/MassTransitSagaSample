@@ -35,15 +35,23 @@ namespace ProductCatalog.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateProductAsync(CreateProductRequestDto createProductRequestDto)
         {
-            // Create product and inventory transaction
-            var createProductResponse = await _productOrchestratorService.CreateProductAndPublishEvent(createProductRequestDto, HttpContext.TraceIdentifier);
-
-            if (createProductResponse.IsSuccess)
+            try
             {
-                return CreatedAtAction(nameof(GetProductByIdAsync), new { id = createProductResponse.Value }, null);
-            }
+                // Create product and inventory transaction
+                var createProductResponse = await _productOrchestratorService.CreateProductAndPublishEvent(createProductRequestDto, HttpContext.TraceIdentifier);
 
-            return BadRequest(createProductResponse.Error);
+                if (createProductResponse.IsSuccess)
+                {
+                    return Ok(createProductResponse);
+                }
+
+                return BadRequest(createProductResponse.Error);
+            }
+            catch (System.Exception ex)
+            {
+
+                throw;
+            }
         }
     }
 }

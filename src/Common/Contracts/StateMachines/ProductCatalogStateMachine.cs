@@ -32,7 +32,8 @@ namespace Contracts.StateMachines
                                   .Then(c => logger.Info($"Product Catalog Added to {c.Data.CorrelationId} received"))
                                     .ThenAsync(c => this.SendCommand<ICreateSalesProduct>("rabbitmq://localhost/sagas-demo-sale", c))
                                       .TransitionTo(SalesSubmited);
-                                    
+                                     
+
 
         private EventActivityBinder<ProductCatalogState, ISalesProductAdded> SetSalesProductAddedHandler() =>
            When(SalesProductAdded).Then(c => this.UpdateSagaState(c.Instance, c.Data.Product))
@@ -50,12 +51,11 @@ namespace Contracts.StateMachines
             Event(() => ProductCatalogAdded, x => x.CorrelateById(c => c.Message.CorrelationId).SelectId(c => c.Message.CorrelationId));
             Event(() => SalesProductAdded, x => x.CorrelateById(c => c.Message.CorrelationId).SelectId(c => c.Message.CorrelationId));
             Event(() => InventoryProductAdded, x => x.CorrelateById(c => c.Message.CorrelationId).SelectId(c => c.Message.CorrelationId));
-            Event(() => ProductCatalogProcessed, x => x.CorrelateById(c => c.Message.CorrelationId).SelectId(c => c.Message.CorrelationId));
 
         }
         private void UpdateSagaState(ProductCatalogState state, ProductDto productDto)
         {
-            state.Product.ProductId = productDto.ProductId;
+            state.Product.Id = productDto.Id;
             state.Product.ProductName = productDto.ProductName;
             state.Product.InitialOnHand = productDto.InitialOnHand;
             state.Product.ProductStatus = productDto.ProductStatus;
@@ -73,7 +73,6 @@ namespace Contracts.StateMachines
         public Event<IProductCatalogAdded> ProductCatalogAdded { get; private set; }
         public Event<ISalesProductAdded> SalesProductAdded { get; private set; }
         public Event<IInventoryProductAdded> InventoryProductAdded { get; private set; }
-        public Event<IProductCatalogProcessed> ProductCatalogProcessed { get; private set; }
 
         public SagaState Pending { get; private set; }
         public SagaState SalesSubmited { get; private set; }

@@ -7,11 +7,14 @@
 
   <ItemGroup>
 	  <PackageReference Include="Common.Logging.NLog41" Version="3.4.1" />
+	  <PackageReference Include="dapper" Version="2.0.90" />
 	  <PackageReference Include="MassTransit" Version="7.2.2" />
+	  <PackageReference Include="MassTransit.DapperIntegration" Version="7.2.2" />
 	  <PackageReference Include="MassTransit.RabbitMQ" Version="7.2.2" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\AzureProcessor\AzureProcessor.csproj" />
     <ProjectReference Include="..\Contracts\Contracts.csproj" />
   </ItemGroup>
 

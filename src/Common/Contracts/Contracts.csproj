@@ -5,6 +5,8 @@
   </PropertyGroup>
 	<ItemGroup>
 
+		<PackageReference Include="Dapper.Contrib" Version="2.0.78" />
+
 		<PackageReference Include="MassTransit.Analyzers" Version="7.2.2" />
 		<PackageReference Include="Common.Logging.NLog41" Version="3.4.1" />
 		<PackageReference Include="MassTransit.AspNetCore" Version="7.2.2" />

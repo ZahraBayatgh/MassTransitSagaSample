@@ -35,7 +35,7 @@ namespace ProductCatalogService.Consumers
                 CheckSalesProductAddContext(context);
 
                 // Get and Check product in db
-                var getProduct = await _productService.GetProductByIdAsync(context.Message.Product.ProductId);
+                var getProduct = await _productService.GetProductByIdAsync(context.Message.Product.Id);
 
                 if (getProduct.IsSuccess && context.Message.Product.ProductStatus == ProductStatus.SalesIsOk)
                 {
@@ -81,7 +81,7 @@ namespace ProductCatalogService.Consumers
             if (context == null)
                 throw new ArgumentNullException("SalesProductAddedContext is null.");
 
-            if (context.Message.Product.ProductId <= 0)
+            if (context.Message.Product.Id <= 0)
                 throw new ArgumentNullException("SalesProductAddedContext ProductId is invalid.");
         }
     }

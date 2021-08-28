@@ -5,7 +5,7 @@ namespace Contracts.Dtos
     [Serializable]
     public class ProductDto
     {
-        public int ProductId { get; set; }
+        public int Id { get; set; }
         public string ProductName { get; set; }
         public int InitialOnHand { get; set; }
         public ProductStatus ProductStatus { get; set; }
