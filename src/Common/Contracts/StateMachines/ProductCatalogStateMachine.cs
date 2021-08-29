@@ -15,8 +15,6 @@ namespace Contracts.StateMachines
 
         public ProductCatalogStateMachine()
         {
-            try
-            {
                 logger = LogManager.GetLogger<ProductCatalogStateMachine>();
 
                 InstanceState(x => x.CurrentState);
@@ -27,22 +25,16 @@ namespace Contracts.StateMachines
                 During(SalesSubmited, SetSalesProductAddedHandler(), SetInventoryAddedHandler());
 
                 SetCompletedWhenFinalized();
-            }
-            catch (Exception ex)
-            {
-
-                throw;
-            }
 
         }
-        private EventActivityBinder<ProductCatalogState, IProductCatalogAdded> SetProductCatalogAddedHandler() =>
-            When(ProductCatalogAdded).Then(c => UpdateSagaState(c.Instance, c.Data.Product))
+        private EventActivityBinder<ProductCatalogState, IProductCatalogAdded> SetProductCatalogAddedHandler()=>
+         When(ProductCatalogAdded).Then(c => UpdateSagaState(c.Instance, c.Data.Product))
                                   .Then(c => logger.Info($"Product Catalog Added to {c.Data.CorrelationId} received"))
                                     .ThenAsync(c => this.SendCommand<ICreateSalesProduct>("rabbitmq://localhost/sagas-demo-sale", c))
                                       .TransitionTo(SalesSubmited);
 
-        private EventActivityBinder<ProductCatalogState, ISalesProductAdded> SetSalesProductAddedHandler() =>
-           When(SalesProductAdded).Then(c => this.UpdateSagaState(c.Instance, c.Data.Product))
+        private EventActivityBinder<ProductCatalogState, ISalesProductAdded> SetSalesProductAddedHandler()=>
+        When(SalesProductAdded).Then(c => this.UpdateSagaState(c.Instance, c.Data.Product))
                                       .Then(c => this.logger.Info($"Sales Product Added to {c.Data.CorrelationId} received"))
                                      .TransitionTo(InventorySubmited);
         private EventActivityBinder<ProductCatalogState, IInventoryProductAdded> SetInventoryAddedHandler()=>

@@ -39,6 +39,7 @@ namespace ProductCatalog
                 {
                     cfg.ReceiveEndpoint("sagas-demo-product-catalog", e =>
                     {
+                        //e.UseInMemoryOutbox();
                         e.ConfigureConsumer<CheckSalesProductAddedConsumer>(context);
                         e.ConfigureConsumer<CheckInventoryProductAddedConsumer>(context);
                     });

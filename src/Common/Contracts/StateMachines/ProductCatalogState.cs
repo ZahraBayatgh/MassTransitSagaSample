@@ -9,10 +9,7 @@ namespace Contracts.StateMachines
 {
     public class ProductCatalogState : SagaStateMachineInstance, IVersionedSaga
     {
-        public ProductCatalogState()
-        {
 
-        }
         public ProductCatalogState(Guid correlationId)
         {
             CorrelationId = correlationId;
