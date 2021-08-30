@@ -5,17 +5,17 @@ using System.Collections.Generic;
 
 namespace AzureProcessor.Data
 {
-    public class ProductCatalogDbContext :
+    public class ProductDbContext :
     SagaDbContext
     {
-        public ProductCatalogDbContext(DbContextOptions options)
+        public ProductDbContext(DbContextOptions options)
             : base(options)
         {
         }
 
         protected override IEnumerable<ISagaClassMap> Configurations
         {
-            get { yield return new ProductCatalogStateMap(); }
+            get { yield return new ProductStateMap(); }
         }
     }
 }

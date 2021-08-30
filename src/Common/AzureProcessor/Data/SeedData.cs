@@ -21,7 +21,7 @@ namespace AzureProcessor.Data
             serviceCollection.AddSingleton<IConfiguration>(config);
 
             // DbContext
-            serviceCollection.AddDbContext<ProductCatalogDbContext>(option =>
+            serviceCollection.AddDbContext<ProductDbContext>(option =>
             {
                 var connectionString = config.GetConnectionString("DefaultConnection");
                 if (string.IsNullOrEmpty(connectionString))
@@ -40,7 +40,7 @@ namespace AzureProcessor.Data
             using (var serviceScope = GenerateServiceScope())
             {
                 var serviceProvider = serviceScope.ServiceProvider;
-                var context = serviceProvider.GetService<ProductCatalogDbContext>();
+                var context = serviceProvider.GetService<ProductDbContext>();
                 context.Database.EnsureCreated();
 
                 Console.WriteLine("Database Created");

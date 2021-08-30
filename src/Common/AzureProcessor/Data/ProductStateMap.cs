@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace AzureProcessor.Data
 {
-    public class ProductCatalogStateMap :
+    public class ProductStateMap :
     SagaClassMap<ProductCatalogState>
     {
         protected override void Configure(EntityTypeBuilder<ProductCatalogState> entity, ModelBuilder model)

@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace AzureProcessor.Migrations
 {
-    [DbContext(typeof(ProductCatalogDbContext))]
+    [DbContext(typeof(ProductDbContext))]
     [Migration("20210826110648_AddSagaDb")]
     partial class AddSagaDb
     {

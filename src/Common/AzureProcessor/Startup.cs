@@ -37,12 +37,12 @@ namespace AzureProcessor
                     {
                        // r.ConcurrencyMode = ConcurrencyMode.Pessimistic; // or use Optimistic, which requires RowVersion
 
-                       r.AddDbContext<DbContext, ProductCatalogDbContext>((provider, builder) =>
+                       r.AddDbContext<DbContext, ProductDbContext>((provider, builder) =>
                         {
                             builder.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"), m =>
                             {
                                 m.MigrationsAssembly(Assembly.GetExecutingAssembly().GetName().Name);
-                                m.MigrationsHistoryTable($"__{nameof(ProductCatalogDbContext)}");
+                                m.MigrationsHistoryTable($"__{nameof(ProductDbContext)}");
                             });
                         });
                     });
