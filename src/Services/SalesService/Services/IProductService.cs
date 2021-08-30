@@ -10,7 +10,7 @@ namespace SalesService.Services
         Task<Result<Product>> GetProductByIdAsync(int productId);
         Task<Result<Product>> GetProductByNameAsync(string productName);
         Task<Result<int>> CreateProductAsync(CreateProductRequestDto createProductRequestDto);
-        Task<Result> DeleteProductAsync(int productId);
+        Task<Result> DeleteProductByNameAsync(string productName);
         Task<Result> UpdateProductCountAsync(UpdateProductCountDto updateProductDto);
         Task<Result> CancelChangeProductCountAsync(CancelChangeProductCountDto createProductDto);
     }

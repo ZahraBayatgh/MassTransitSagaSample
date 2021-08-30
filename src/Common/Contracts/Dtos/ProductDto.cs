@@ -18,6 +18,5 @@ namespace Contracts.Dtos
         SalesIsOk = 2,
         InventoryIsOk = 4,
         Completed = 6,
-        Failed=8
     }
 }

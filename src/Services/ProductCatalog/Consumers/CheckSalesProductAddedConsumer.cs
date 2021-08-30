@@ -44,24 +44,18 @@ namespace ProductCatalogService.Consumers
 
                     await _productService.UpdateProductStatusAsync(updateProductStatusRequestDto);
                      context.Message.Product.ProductStatus = ProductStatus.SalesIsOk;
+
+                    await context.Publish<ICreateInventoryProduct>(new
+                    {
+                        CorrelationId = context.Message.CorrelationId,
+                        Product = context.Message.Product
+                    });
                 }
                 else if (getProduct.IsSuccess && context.Message.Product.ProductStatus == ProductStatus.Pending)
                 {
                     // Delete product
                     await _productService.DeleteProductAsync(getProduct.Value.Id);
-                    context.Message.Product.ProductStatus = ProductStatus.Failed;
                 }
-
-                await context.Publish<ICreateInventoryProduct>(new
-                {
-                    CorrelationId = context.Message.CorrelationId,
-                    Product = context.Message.Product
-                });
-                //await context.Publish<IInventoryProductAdded>(new
-                //{
-                //    CorrelationId = context.Message.CorrelationId,
-                //    Product = context.Message.Product
-                //});
 
                 transaction.Commit();
 

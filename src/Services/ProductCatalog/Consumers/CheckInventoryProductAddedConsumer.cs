@@ -44,11 +44,15 @@ namespace ProductCatalogService.Consumers
                     await _productService.UpdateProductStatusAsync(updateProductStatusRequestDto);
                     context.Message.Product.ProductStatus = ProductStatus.Completed;
                 }
-                else if (getProduct.Value!=null && context.Message.Product.ProductStatus == ProductStatus.Failed)
+                else 
                 {
                    // Delete product
                     await _productService.DeleteProductAsync(getProduct.Value.Id);
-                    context.Message.Product.ProductStatus = ProductStatus.Failed;
+                    await context.Publish<IProductRejected>(new
+                    {
+                        CorrelationId = context.Message.CorrelationId,
+                        Product = context.Message.Product
+                    });
                 }
 
                 transaction.Commit();

@@ -55,13 +55,8 @@ namespace ProductCatalogService.Consumers
                     var inventoryTransactionResponse = await _inventoryTransactionService.CreateInventoryTransactionAsync(InventoryTransactionDto);
 
                     createProductStatus = createProductResponce.IsSuccess ? true : false;
-                    context.Message.Product.ProductStatus = ProductStatus.InventoryIsOk;
-
                 }
-                else
-                {
-                    context.Message.Product.ProductStatus = ProductStatus.Failed;
-                }
+              
                 await PublishResult(context, createProductStatus);
                 transaction.Commit();
 
@@ -81,6 +76,9 @@ namespace ProductCatalogService.Consumers
         }
         private async Task PublishResult(ConsumeContext<ICreateInventoryProduct> context, bool createProductStatus)
         {
+            if (createProductStatus)
+                context.Message.Product.ProductStatus = ProductStatus.InventoryIsOk;
+
             await context.Publish<IInventoryProductAdded>(new
             {
                 CorrelationId = context.Message.CorrelationId,

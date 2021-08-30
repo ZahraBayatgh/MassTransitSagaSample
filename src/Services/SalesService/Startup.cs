@@ -28,12 +28,15 @@ namespace SalesService
             services.AddMassTransit(x =>
             {
                 x.AddConsumer<CreateSalesProductConsumer>();
+                x.AddConsumer<DeleteSalesProductConsumer>();
 
                 x.UsingRabbitMq((context, cfg) =>
                 {
                     cfg.ReceiveEndpoint("sagas-demo-sale", e =>
                     {
                         e.ConfigureConsumer<CreateSalesProductConsumer>(context);
+                        e.ConfigureConsumer<DeleteSalesProductConsumer>(context);
+                        
                     });
                 });
             });

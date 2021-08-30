@@ -161,18 +161,18 @@ namespace SalesService.Services
         /// This method delete a Product to the table.
         /// If the input productId is not valid or an expiration occurs, a Failure will be returned.
         /// </summary>
-        /// <param name="productId"></param>
+        /// <param name="productName"></param>
         /// <returns></returns>
-        public async Task<Result> DeleteProductAsync(int productId)
+        public async Task<Result> DeleteProductByNameAsync(string productName)
         {
             try
             {
                 // Check product id
-                if (productId <= 0)
+                if (string.IsNullOrEmpty(productName))
                     return Result.Failure($"Product id is zero.");
 
                 // Get product by product id
-                var product = await _context.Products.FirstOrDefaultAsync(x => x.Id == productId);
+                var product = await _context.Products.FirstOrDefaultAsync(x => x.Name == productName);
                 if (product == null)
                     return Result.Failure($"Product id is invalid.");
 
@@ -184,9 +184,9 @@ namespace SalesService.Services
             }
             catch (Exception ex)
             {
-                _logger.LogInformation($"Delete product with {productId} id failed. Exception detail:{ex.Message}");
+                _logger.LogInformation($"Delete product with {productName} id failed. Exception detail:{ex.Message}");
 
-                return Result.Failure($"Delete product with {productId} id failed.");
+                return Result.Failure($"Delete product with {productName} id failed.");
             }
         }
         /// <summary>
@@ -278,5 +278,6 @@ namespace SalesService.Services
             return Result.Success();
         }
 
+     
     }
 }
