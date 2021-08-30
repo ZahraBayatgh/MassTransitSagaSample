@@ -1,4 +1,4 @@
-using AzureProcessor.Maps;
+using AzureProcessor.Data;
 using Contracts.StateMachines;
 using MassTransit;
 using MassTransit.EntityFrameworkCoreIntegration;

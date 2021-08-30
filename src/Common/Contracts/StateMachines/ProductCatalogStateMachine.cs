@@ -30,21 +30,21 @@ namespace Contracts.StateMachines
             SetCompletedWhenFinalized();
 
         }
-        private EventActivityBinder<ProductCatalogState, IProductCatalogAdded> SetProductCatalogAddedHandler() =>
+        private EventActivityBinder<ProductCatalogState, IProductAddedEvent> SetProductCatalogAddedHandler() =>
          When(ProductCatalogAdded).Then(c => UpdateSagaState(c.Instance, c.Data.Product))
                                   .Then(c => logger.Info($"Product Catalog Added to {c.Data.CorrelationId} received"))
-                                    .ThenAsync(c => this.SendCommand<ICreateSalesProduct>("rabbitmq://localhost/sagas-demo-sale", c))
+                                    .ThenAsync(c => this.SendCommand<ICreateSalesProductCommand>("rabbitmq://localhost/sagas-demo-sale", c))
                                       .TransitionTo(SalesSubmited);
 
-        private EventActivityBinder<ProductCatalogState, ISalesProductAdded> SetSalesProductAddedHandler()=>
+        private EventActivityBinder<ProductCatalogState, ISalesProductAddedEvent> SetSalesProductAddedHandler()=>
         When(SalesProductAdded).Then(c => this.UpdateSagaState(c.Instance, c.Data.Product))
                                       .Then(c => this.logger.Info($"Sales Product Added to {c.Data.CorrelationId} received"))
                                      .TransitionTo(InventorySubmited);
-        private EventActivityBinder<ProductCatalogState, IInventoryProductAdded> SetInventoryAddedHandler() =>
+        private EventActivityBinder<ProductCatalogState, IInventoryProductAddedEvent> SetInventoryAddedHandler() =>
           When(InventoryProductAdded).Then(c => this.UpdateSagaState(c.Instance, c.Data.Product))
                                   .Then(c => this.logger.Info($"Inventory Product Added to {c.Data.CorrelationId} received"))
                                 .TransitionTo(Completed).Finalize();
-        private EventActivityBinder<ProductCatalogState, IProductRejected> SetProductRejectedHandler() =>
+        private EventActivityBinder<ProductCatalogState, IProductRejectedEvent> SetProductRejectedHandler() =>
               When(ProductRejected).Then(c => this.UpdateSagaState(c.Instance, c.Data.Product))
                                       .Then(c => this.logger.Info($" Product Rejected to {c.Data.CorrelationId} received"))
                                     .TransitionTo(Rejected)
@@ -74,10 +74,10 @@ namespace Contracts.StateMachines
                 context.Data.Product,
             });
         }
-        public Event<IProductCatalogAdded> ProductCatalogAdded { get; private set; }
-        public Event<ISalesProductAdded> SalesProductAdded { get; private set; }
-        public Event<IInventoryProductAdded> InventoryProductAdded { get; private set; }
-        public Event<IProductRejected> ProductRejected { get; private set; }
+        public Event<IProductAddedEvent> ProductCatalogAdded { get; private set; }
+        public Event<ISalesProductAddedEvent> SalesProductAdded { get; private set; }
+        public Event<IInventoryProductAddedEvent> InventoryProductAdded { get; private set; }
+        public Event<IProductRejectedEvent> ProductRejected { get; private set; }
         
         public SagaState Pending { get; private set; }
         public SagaState SalesSubmited { get; private set; }

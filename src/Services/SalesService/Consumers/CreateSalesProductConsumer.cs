@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace SalesService.Consumers
 {
-    public class CreateSalesProductConsumer : IConsumer<ICreateSalesProduct>
+    public class CreateSalesProductConsumer : IConsumer<ICreateSalesProductCommand>
     {
         private readonly ILogger<CreateSalesProductConsumer> _logger;
         private readonly IProductService _productService;
@@ -21,7 +21,7 @@ namespace SalesService.Consumers
             _logger = logger;
             _productService = productService;
         }
-        public async Task Consume(ConsumeContext<ICreateSalesProduct> context)
+        public async Task Consume(ConsumeContext<ICreateSalesProductCommand> context)
         {
             try
             {
@@ -55,19 +55,19 @@ namespace SalesService.Consumers
 
         }
 
-        private async Task PublishResult(ConsumeContext<ICreateSalesProduct> context, bool createProductStatus)
+        private async Task PublishResult(ConsumeContext<ICreateSalesProductCommand> context, bool createProductStatus)
         {
             if (createProductStatus)
                 context.Message.Product.ProductStatus = ProductStatus.SalesIsOk;
 
-            await context.Publish<ISalesProductAdded>(new
+            await context.Publish<ISalesProductAddedEvent>(new
             {
                 CorrelationId = context.Message.CorrelationId,
                 Product = context.Message.Product
             });
         }
 
-        private static void CheckCreateProductIntegrationEventInstance(ConsumeContext<ICreateSalesProduct> context)
+        private static void CheckCreateProductIntegrationEventInstance(ConsumeContext<ICreateSalesProductCommand> context)
         {
             if (context == null)
                 throw new ArgumentNullException("CreateSalesProduct is null.");

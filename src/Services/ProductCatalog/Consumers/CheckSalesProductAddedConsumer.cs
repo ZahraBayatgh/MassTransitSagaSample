@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace ProductCatalogService.Consumers
 {
-    public class CheckSalesProductAddedConsumer : IConsumer<ISalesProductAdded>
+    public class CheckSalesProductAddedConsumer : IConsumer<ISalesProductAddedEvent>
     {
         private readonly ILogger<CheckSalesProductAddedConsumer> _logger;
         private readonly ProductCatalogDbContext _context;
@@ -26,7 +26,7 @@ namespace ProductCatalogService.Consumers
             _productService = productService;
         }
 
-        public async Task Consume(ConsumeContext<ISalesProductAdded> context)
+        public async Task Consume(ConsumeContext<ISalesProductAddedEvent> context)
         {
             using var transaction = _context.Database.BeginTransaction();
             try
@@ -45,7 +45,7 @@ namespace ProductCatalogService.Consumers
                     await _productService.UpdateProductStatusAsync(updateProductStatusRequestDto);
                      context.Message.Product.ProductStatus = ProductStatus.SalesIsOk;
 
-                    await context.Publish<ICreateInventoryProduct>(new
+                    await context.Publish<ICreateInventoryProductEvent>(new
                     {
                         CorrelationId = context.Message.CorrelationId,
                         Product = context.Message.Product
@@ -74,7 +74,7 @@ namespace ProductCatalogService.Consumers
             }
         }
 
-        private static void CheckSalesProductAddContext(ConsumeContext<ISalesProductAdded> context)
+        private static void CheckSalesProductAddContext(ConsumeContext<ISalesProductAddedEvent> context)
         {
             if (context == null)
                 throw new ArgumentNullException("SalesProductAddedContext is null.");

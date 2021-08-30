@@ -43,7 +43,7 @@ namespace ProductCatalogService.Services
                     };
                     // Publish CreateProductIntegrationEvent
                     var bus = CreateBust();
-                    await bus.Publish<IProductCatalogAdded>(new
+                    await bus.Publish<IProductAddedEvent>(new
                     {
                         CorrelationId = Guid.NewGuid(),
                         Product = productDto

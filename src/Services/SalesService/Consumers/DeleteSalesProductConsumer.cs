@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace SalesService.Consumers
 {
-    public class DeleteSalesProductConsumer : IConsumer<IProductRejected>
+    public class DeleteSalesProductConsumer : IConsumer<IProductRejectedEvent>
     {
         private readonly ILogger<CreateSalesProductConsumer> _logger;
         private readonly IProductService _productService;
@@ -21,7 +21,7 @@ namespace SalesService.Consumers
             _logger = logger;
             _productService = productService;
         }
-        public async Task Consume(ConsumeContext<IProductRejected> context)
+        public async Task Consume(ConsumeContext<IProductRejectedEvent> context)
         {
             try
             {
@@ -41,7 +41,7 @@ namespace SalesService.Consumers
             }
 
         }
-        private static void CheckProductIntegrationEventInstance(ConsumeContext<IProductRejected> context)
+        private static void CheckProductIntegrationEventInstance(ConsumeContext<IProductRejectedEvent> context)
         {
             if (context == null)
                 throw new ArgumentNullException("SalesProduct is null.");

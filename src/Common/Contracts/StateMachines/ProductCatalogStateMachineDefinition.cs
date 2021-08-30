@@ -17,10 +17,10 @@ namespace Contracts.StateMachines
         {
             var partition = endpointConfigurator.CreatePartitioner(16);
 
-            sagaConfigurator.Message<IProductCatalogAdded>(x => x.UsePartitioner(partition, m => m.Message.CorrelationId));
-            sagaConfigurator.Message<ISalesProductAdded>(x => x.UsePartitioner(partition, m => m.Message.CorrelationId));
-            sagaConfigurator.Message<IInventoryProductAdded>(x => x.UsePartitioner(partition, m => m.Message.CorrelationId));
-            sagaConfigurator.Message<IProductRejected>(x => x.UsePartitioner(partition, m => m.Message.CorrelationId));
+            sagaConfigurator.Message<IProductAddedEvent>(x => x.UsePartitioner(partition, m => m.Message.CorrelationId));
+            sagaConfigurator.Message<ISalesProductAddedEvent>(x => x.UsePartitioner(partition, m => m.Message.CorrelationId));
+            sagaConfigurator.Message<IInventoryProductAddedEvent>(x => x.UsePartitioner(partition, m => m.Message.CorrelationId));
+            sagaConfigurator.Message<IProductRejectedEvent>(x => x.UsePartitioner(partition, m => m.Message.CorrelationId));
             
             //endpointConfigurator.UseMessageRetry(r => r.Interval(3, 1000));
             //endpointConfigurator.UseInMemoryOutbox();

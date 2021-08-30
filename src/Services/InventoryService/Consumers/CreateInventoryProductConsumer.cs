@@ -11,7 +11,7 @@ using InventoryService.Models;
 
 namespace ProductCatalogService.Consumers
 {
-    public class CreateInventoryProductConsumer : IConsumer<ICreateInventoryProduct>
+    public class CreateInventoryProductConsumer : IConsumer<ICreateInventoryProductEvent>
     {
         private readonly ILogger<CreateInventoryProductConsumer> _logger;
         private readonly InventoryDbContext _context;
@@ -27,7 +27,7 @@ namespace ProductCatalogService.Consumers
             _inventoryTransactionService = inventoryTransactionService;
             _productService = productService;
         }
-        public async Task Consume(ConsumeContext<ICreateInventoryProduct> context)
+        public async Task Consume(ConsumeContext<ICreateInventoryProductEvent> context)
         {
             using var transaction = _context.Database.BeginTransaction();
 
@@ -74,18 +74,18 @@ namespace ProductCatalogService.Consumers
                 throw;
             }
         }
-        private async Task PublishResult(ConsumeContext<ICreateInventoryProduct> context, bool createProductStatus)
+        private async Task PublishResult(ConsumeContext<ICreateInventoryProductEvent> context, bool createProductStatus)
         {
             if (createProductStatus)
                 context.Message.Product.ProductStatus = ProductStatus.InventoryIsOk;
 
-            await context.Publish<IInventoryProductAdded>(new
+            await context.Publish<IInventoryProductAddedEvent>(new
             {
                 CorrelationId = context.Message.CorrelationId,
                 Product = context.Message.Product
             });
         }
-        private static void CheckSalesProductAddContext(ConsumeContext<ICreateInventoryProduct> context)
+        private static void CheckSalesProductAddContext(ConsumeContext<ICreateInventoryProductEvent> context)
         {
             if (context == null)
                 throw new ArgumentNullException("SalesProductAddedContext is null.");

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace AzureProcessor.Maps
+namespace AzureProcessor.Data
 {
     public class SeedData
     {
