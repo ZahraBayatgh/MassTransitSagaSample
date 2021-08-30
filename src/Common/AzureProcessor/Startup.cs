@@ -32,7 +32,7 @@ namespace AzureProcessor
         {
             services.AddMassTransit(cfg =>
             {
-                cfg.AddSagaStateMachine<ProductCatalogStateMachine, ProductCatalogState>(typeof(ProductCatalogStateMachineDefinition))
+                cfg.AddSagaStateMachine<ProductStateMachine, ProductState>(typeof(ProductStateMachineDefinition))
                     .EntityFrameworkRepository(r =>
                     {
                        // r.ConcurrencyMode = ConcurrencyMode.Pessimistic; // or use Optimistic, which requires RowVersion

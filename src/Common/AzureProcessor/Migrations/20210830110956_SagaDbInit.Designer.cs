@@ -4,14 +4,16 @@ using AzureProcessor.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace AzureProcessor.Migrations
 {
     [DbContext(typeof(ProductDbContext))]
-    partial class ProductCatalogDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210830110956_SagaDbInit")]
+    partial class SagaDbInit
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -22,9 +24,7 @@ namespace AzureProcessor.Migrations
             modelBuilder.Entity("Contracts.Dtos.ProductDto", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("int");
 
                     b.Property<int>("InitialOnHand")
                         .HasColumnType("int");
@@ -40,7 +40,7 @@ namespace AzureProcessor.Migrations
                     b.ToTable("ProductDto");
                 });
 
-            modelBuilder.Entity("Contracts.StateMachines.ProductCatalogState", b =>
+            modelBuilder.Entity("Contracts.StateMachines.ProductState", b =>
                 {
                     b.Property<Guid>("CorrelationId")
                         .HasColumnType("uniqueidentifier");
@@ -59,10 +59,10 @@ namespace AzureProcessor.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("ProductCatalogState");
+                    b.ToTable("ProductState");
                 });
 
-            modelBuilder.Entity("Contracts.StateMachines.ProductCatalogState", b =>
+            modelBuilder.Entity("Contracts.StateMachines.ProductState", b =>
                 {
                     b.HasOne("Contracts.Dtos.ProductDto", "Product")
                         .WithMany()

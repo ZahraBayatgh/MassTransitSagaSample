@@ -7,10 +7,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Contracts.StateMachines
 {
-    public class ProductCatalogState : SagaStateMachineInstance, IVersionedSaga
+    public class ProductState : SagaStateMachineInstance, IVersionedSaga
     {
 
-        public ProductCatalogState(Guid correlationId)
+        public ProductState(Guid correlationId)
         {
             CorrelationId = correlationId;
             Product = new ProductDto();

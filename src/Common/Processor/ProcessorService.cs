@@ -53,16 +53,16 @@ namespace Processor
 
         private void ConfigureSagaEndpoint(IRabbitMqReceiveEndpointConfigurator endPointConfigurator)
         {
-            var stateMachine = new ProductCatalogStateMachine();
+            var stateMachine = new ProductStateMachine();
             var repository = CreateRepository();
 
             endPointConfigurator.PrefetchCount = MAX_NUMBER_OF_PROCESSING_MESSAGES;
             endPointConfigurator.StateMachineSaga(stateMachine, repository);
         }
 
-        private ISagaRepository<ProductCatalogState> CreateRepository()
+        private ISagaRepository<ProductState> CreateRepository()
         {
-            return new InMemorySagaRepository<ProductCatalogState>();
+            return new InMemorySagaRepository<ProductState>();
             //return DapperSagaRepository<ProductCatalogState>.Create("Server=(localdb)\\MSSQLLocalDB;Database=SagaDb;Trusted_Connection=True;MultipleActiveResultSets=false");
         }
 

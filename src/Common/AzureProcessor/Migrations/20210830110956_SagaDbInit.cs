@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace AzureProcessor.Migrations
 {
-    public partial class AddSagaDb : Migration
+    public partial class SagaDbInit : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -11,8 +11,7 @@ namespace AzureProcessor.Migrations
                 name: "ProductDto",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<int>(type: "int", nullable: false),
                     ProductName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     InitialOnHand = table.Column<int>(type: "int", nullable: false),
                     ProductStatus = table.Column<int>(type: "int", nullable: false)
@@ -23,7 +22,7 @@ namespace AzureProcessor.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ProductCatalogState",
+                name: "ProductState",
                 columns: table => new
                 {
                     CorrelationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -33,9 +32,9 @@ namespace AzureProcessor.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ProductCatalogState", x => x.CorrelationId);
+                    table.PrimaryKey("PK_ProductState", x => x.CorrelationId);
                     table.ForeignKey(
-                        name: "FK_ProductCatalogState_ProductDto_ProductId",
+                        name: "FK_ProductState_ProductDto_ProductId",
                         column: x => x.ProductId,
                         principalTable: "ProductDto",
                         principalColumn: "Id",
@@ -43,15 +42,15 @@ namespace AzureProcessor.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductCatalogState_ProductId",
-                table: "ProductCatalogState",
+                name: "IX_ProductState_ProductId",
+                table: "ProductState",
                 column: "ProductId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "ProductCatalogState");
+                name: "ProductState");
 
             migrationBuilder.DropTable(
                 name: "ProductDto");

@@ -6,9 +6,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace AzureProcessor.Data
 {
     public class ProductStateMap :
-    SagaClassMap<ProductCatalogState>
+    SagaClassMap<ProductState>
     {
-        protected override void Configure(EntityTypeBuilder<ProductCatalogState> entity, ModelBuilder model)
+        protected override void Configure(EntityTypeBuilder<ProductState> entity, ModelBuilder model)
         {
             entity.Property(x => x.CurrentState).HasMaxLength(64);
 
