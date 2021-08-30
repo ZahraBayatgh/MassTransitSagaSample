@@ -1,7 +1,7 @@
 ﻿using Automatonymous;
 using Automatonymous.Binders;
 using Common.Logging;
-using Contracts.Dtos;
+using Contracts.Data;
 using Contracts.Events;
 using System;
 using System.Threading.Tasks;
@@ -31,21 +31,21 @@ namespace Contracts.StateMachines
 
         }
         private EventActivityBinder<ProductState, IProductAddedEvent> SetProductCatalogAddedHandler() =>
-         When(ProductCatalogAdded).Then(c => UpdateSagaState(c.Instance, c.Data.Product))
+         When(ProductCatalogAdded).Then(c => UpdateSagaState(c.Instance, c.Data.ProductId,c.Data.ProductName,c.Data.InitialOnHand,c.Data.ProductStatus))
                                   .Then(c => logger.Info($"Product Catalog Added to {c.Data.CorrelationId} received"))
                                     .ThenAsync(c => this.SendCommand<ICreateSalesProductCommand>("rabbitmq://localhost/sagas-demo-sale", c))
                                       .TransitionTo(SalesSubmited);
 
         private EventActivityBinder<ProductState, ISalesProductAddedEvent> SetSalesProductAddedHandler()=>
-        When(SalesProductAdded).Then(c => this.UpdateSagaState(c.Instance, c.Data.Product))
+        When(SalesProductAdded).Then(c => this.UpdateSagaState(c.Instance,c.Data.ProductId, c.Data.ProductName, c.Data.InitialOnHand, c.Data.ProductStatus))
                                       .Then(c => this.logger.Info($"Sales Product Added to {c.Data.CorrelationId} received"))
                                      .TransitionTo(InventorySubmited);
         private EventActivityBinder<ProductState, IInventoryProductAddedEvent> SetInventoryAddedHandler() =>
-          When(InventoryProductAdded).Then(c => this.UpdateSagaState(c.Instance, c.Data.Product))
+          When(InventoryProductAdded).Then(c => this.UpdateSagaState(c.Instance, c.Data.ProductId, c.Data.ProductName, c.Data.InitialOnHand, c.Data.ProductStatus))
                                   .Then(c => this.logger.Info($"Inventory Product Added to {c.Data.CorrelationId} received"))
                                 .TransitionTo(Completed).Finalize();
         private EventActivityBinder<ProductState, IProductRejectedEvent> SetProductRejectedHandler() =>
-              When(ProductRejected).Then(c => this.UpdateSagaState(c.Instance, c.Data.Product))
+              When(ProductRejected).Then(c => this.UpdateSagaState(c.Instance, c.Data.ProductId, c.Data.ProductName, c.Data.InitialOnHand, c.Data.ProductStatus))
                                       .Then(c => this.logger.Info($" Product Rejected to {c.Data.CorrelationId} received"))
                                     .TransitionTo(Rejected)
                                          .Finalize();
@@ -57,12 +57,12 @@ namespace Contracts.StateMachines
             Event(() => ProductRejected, x => x.CorrelateById(c => c.Message.CorrelationId).SelectId(c => c.Message.CorrelationId));
             
         }
-        private void UpdateSagaState(ProductState state, ProductDto productDto)
+        private void UpdateSagaState(ProductState state, int productId,string productName,int initialOnHand, ProductStatus productStatus)
         {
-            state.Product.Id = productDto.Id;
-            state.Product.ProductName = productDto.ProductName;
-            state.Product.InitialOnHand = productDto.InitialOnHand;
-            state.Product.ProductStatus = productDto.ProductStatus;
+            state.ProductId = productId;
+            state.ProductName = productName;
+            state.InitialOnHand = initialOnHand;
+            state.ProductStatus = productStatus;
         }
         private async Task SendCommand<TCommand>(string endpointKey, BehaviorContext<ProductState, IProductCatalogMessage> context)
            where TCommand : class, IProductCatalogMessage
@@ -71,7 +71,10 @@ namespace Contracts.StateMachines
             await sendEndpoint.Send<TCommand>(new
             {
                 context.Data.CorrelationId,
-                context.Data.Product,
+                ProductId = context.Data.ProductId,
+                ProductName = context.Data.ProductName,
+                InitialOnHand = context.Data.InitialOnHand,
+                ProductStatus = context.Data.ProductStatus
             });
         }
         public Event<IProductAddedEvent> ProductCatalogAdded { get; private set; }

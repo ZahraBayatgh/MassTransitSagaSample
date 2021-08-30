@@ -1,5 +1,5 @@
 ﻿using Automatonymous;
-using Contracts.Dtos;
+using Contracts.Data;
 using Dapper.Contrib.Extensions;
 using MassTransit.RedisSagas;
 using System;
@@ -13,12 +13,14 @@ namespace Contracts.StateMachines
         public ProductState(Guid correlationId)
         {
             CorrelationId = correlationId;
-            Product = new ProductDto();
         }
         public string CurrentState { get; set; }
         [ExplicitKey]
         public Guid CorrelationId { get; set; }
-        public ProductDto Product { get; set; }
+        public int ProductId { get; set; }
+        public string ProductName { get; set; }
+        public int InitialOnHand { get; set; }
+        public ProductStatus ProductStatus { get; set; }
         public int Version { get; set; }
     }
 }

@@ -1,4 +1,4 @@
-﻿using Contracts.Dtos;
+﻿using Contracts.Data;
 using Contracts.Events;
 using MassTransit;
 using Microsoft.Extensions.Logging;
@@ -34,15 +34,15 @@ namespace ProductCatalogService.Consumers
                 CheckSalesProductAddContext(context);
 
                // Get and Check product in db
-               var getProduct = await _productService.GetProductByIdAsync(context.Message.Product.Id);
+               var getProduct = await _productService.GetProductByIdAsync(context.Message.ProductId);
 
-                if (getProduct.IsSuccess && context.Message.Product.ProductStatus == ProductStatus.InventoryIsOk)
+                if (getProduct.IsSuccess && context.Message.ProductStatus == ProductStatus.InventoryIsOk)
                 {
                     var productStatus = (int)ProductStatus.InventoryIsOk + (int)getProduct.Value.ProductStatus;
                     UpdateProductStatusRequestDto updateProductStatusRequestDto = new UpdateProductStatusRequestDto(getProduct.Value.Name, productStatus);
 
                     await _productService.UpdateProductStatusAsync(updateProductStatusRequestDto);
-                    context.Message.Product.ProductStatus = ProductStatus.Completed;
+                    context.Message.ProductStatus = ProductStatus.Completed;
                 }
                 else 
                 {
@@ -51,7 +51,10 @@ namespace ProductCatalogService.Consumers
                     await context.Publish<IProductRejectedEvent>(new
                     {
                         CorrelationId = context.Message.CorrelationId,
-                        Product = context.Message.Product
+                        ProductId = context.Message.ProductId,
+                        ProductName = context.Message.ProductName,
+                        InitialOnHand = context.Message.InitialOnHand,
+                        ProductStatus = context.Message.ProductStatus
                     });
                 }
 
@@ -77,7 +80,7 @@ namespace ProductCatalogService.Consumers
             if (context == null)
                 throw new ArgumentNullException("SalesProductAddedContext is null.");
 
-            if (context.Message.Product.Id <= 0)
+            if (context.Message.ProductId <= 0)
                 throw new ArgumentNullException("SalesProductAddedContext ProductId is invalid.");
         }
     }

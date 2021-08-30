@@ -1,4 +1,4 @@
-﻿using Contracts.Dtos;
+﻿using Contracts.Data;
 using Contracts.Events;
 using InventoryService.Services;
 using MassTransit;
@@ -36,12 +36,12 @@ namespace ProductCatalogService.Consumers
                 // Check SalesProductAddContext
                 CheckSalesProductAddContext(context);
                 bool createProductStatus = false;
-                if (context.Message.Product.ProductStatus == ProductStatus.SalesIsOk)
+                if (context.Message.ProductStatus == ProductStatus.SalesIsOk)
                 {
                     // Create product
                     var ProductRequestDto = new ProductRequestDto
                     {
-                        ProductName = context.Message.Product.ProductName
+                        ProductName = context.Message.ProductName
                     };
                     var createProductResponce = await _productService.CreateProductAsync(ProductRequestDto);
 
@@ -49,7 +49,7 @@ namespace ProductCatalogService.Consumers
                         throw new Exception("CreateProductIntegrationEvent is failure.");
 
                     // Initial InventoryTransactionRequestDto
-                    var InventoryTransactionDto = new InventoryTransactionRequestDto(createProductResponce.Value.ProductId, context.Message.Product.InitialOnHand, InventoryType.In);
+                    var InventoryTransactionDto = new InventoryTransactionRequestDto(createProductResponce.Value.ProductId, context.Message.InitialOnHand, InventoryType.In);
 
                     // Add InventoryTransaction
                     var inventoryTransactionResponse = await _inventoryTransactionService.CreateInventoryTransactionAsync(InventoryTransactionDto);
@@ -68,7 +68,7 @@ namespace ProductCatalogService.Consumers
             }
             catch (Exception ex)
             {
-                _logger.LogInformation($"SalesResultIntegrationEvent with {context.Message.Product.Id} product id failed. Exception detail:{ex.Message}");
+                _logger.LogInformation($"SalesResultIntegrationEvent with {context.Message.ProductId} product id failed. Exception detail:{ex.Message}");
                 transaction.Rollback();
 
                 throw;
@@ -77,12 +77,15 @@ namespace ProductCatalogService.Consumers
         private async Task PublishResult(ConsumeContext<ICreateInventoryProductEvent> context, bool createProductStatus)
         {
             if (createProductStatus)
-                context.Message.Product.ProductStatus = ProductStatus.InventoryIsOk;
+                context.Message.ProductStatus = ProductStatus.InventoryIsOk;
 
             await context.Publish<IInventoryProductAddedEvent>(new
             {
                 CorrelationId = context.Message.CorrelationId,
-                Product = context.Message.Product
+                ProductId = context.Message.ProductId,
+                ProductName = context.Message.ProductName,
+                InitialOnHand = context.Message.InitialOnHand,
+                ProductStatus = context.Message.ProductStatus
             });
         }
         private static void CheckSalesProductAddContext(ConsumeContext<ICreateInventoryProductEvent> context)
@@ -90,7 +93,7 @@ namespace ProductCatalogService.Consumers
             if (context == null)
                 throw new ArgumentNullException("SalesProductAddedContext is null.");
 
-            if (context.Message.Product.Id <= 0)
+            if (context.Message.ProductId <= 0)
                 throw new ArgumentNullException("SalesProductAddedContext ProductId is invalid.");
         }
     }

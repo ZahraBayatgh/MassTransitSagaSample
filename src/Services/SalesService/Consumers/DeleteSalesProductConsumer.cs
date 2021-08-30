@@ -1,4 +1,4 @@
-﻿using Contracts.Dtos;
+﻿using Contracts.Data;
 using Contracts.Events;
 using MassTransit;
 using Microsoft.Extensions.Logging;
@@ -26,7 +26,7 @@ namespace SalesService.Consumers
             try
             {
                 CheckProductIntegrationEventInstance(context);
-                var createProductResponce = await _productService.DeleteProductByNameAsync(context.Message.Product.ProductName);
+                var createProductResponce = await _productService.DeleteProductByNameAsync(context.Message.ProductName);
             }
             catch (ArgumentNullException ex)
             {
@@ -35,7 +35,7 @@ namespace SalesService.Consumers
             }
             catch (Exception ex)
             {
-                _logger.LogInformation($"Product {context.Message.Product.ProductName} wan not created. Exception detail:{ex.Message}");
+                _logger.LogInformation($"Product {context.Message.ProductName} wan not created. Exception detail:{ex.Message}");
 
                 throw;
             }
@@ -46,10 +46,10 @@ namespace SalesService.Consumers
             if (context == null)
                 throw new ArgumentNullException("SalesProduct is null.");
 
-            if (context.Message.Product.Id <= 0)
+            if (context.Message.ProductId <= 0)
                 throw new ArgumentNullException("SalesProduct ProductId is invalid.");
 
-            if (string.IsNullOrEmpty(context.Message.Product.ProductName))
+            if (string.IsNullOrEmpty(context.Message.ProductName))
                 throw new ArgumentNullException("SalesProduct ProductName is null.");
         }
     }

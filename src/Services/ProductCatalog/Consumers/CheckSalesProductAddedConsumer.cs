@@ -1,4 +1,4 @@
-﻿using Contracts.Dtos;
+﻿using Contracts.Data;
 using Contracts.Events;
 using MassTransit;
 using Microsoft.Extensions.Logging;
@@ -35,23 +35,26 @@ namespace ProductCatalogService.Consumers
                 CheckSalesProductAddContext(context);
 
                 // Get and Check product in db
-                var getProduct = await _productService.GetProductByIdAsync(context.Message.Product.Id);
+                var getProduct = await _productService.GetProductByIdAsync(context.Message.ProductId);
 
-                if (getProduct.IsSuccess && context.Message.Product.ProductStatus == ProductStatus.SalesIsOk)
+                if (getProduct.IsSuccess && context.Message.ProductStatus == ProductStatus.SalesIsOk)
                 {
                     var productStatus = (int)ProductStatus.SalesIsOk + (int)getProduct.Value.ProductStatus;
                     UpdateProductStatusRequestDto updateProductStatusRequestDto = new UpdateProductStatusRequestDto(getProduct.Value.Name, productStatus);
 
                     await _productService.UpdateProductStatusAsync(updateProductStatusRequestDto);
-                     context.Message.Product.ProductStatus = ProductStatus.SalesIsOk;
+                     context.Message.ProductStatus = ProductStatus.SalesIsOk;
 
                     await context.Publish<ICreateInventoryProductEvent>(new
                     {
                         CorrelationId = context.Message.CorrelationId,
-                        Product = context.Message.Product
+                        ProductId = context.Message.ProductId,
+                        ProductName = context.Message.ProductName,
+                        InitialOnHand = context.Message.InitialOnHand,
+                        ProductStatus = context.Message.ProductStatus
                     });
                 }
-                else if (getProduct.IsSuccess && context.Message.Product.ProductStatus == ProductStatus.Pending)
+                else if (getProduct.IsSuccess && context.Message.ProductStatus == ProductStatus.Pending)
                 {
                     // Delete product
                     await _productService.DeleteProductAsync(getProduct.Value.Id);
@@ -79,7 +82,7 @@ namespace ProductCatalogService.Consumers
             if (context == null)
                 throw new ArgumentNullException("SalesProductAddedContext is null.");
 
-            if (context.Message.Product.Id <= 0)
+            if (context.Message.ProductId <= 0)
                 throw new ArgumentNullException("SalesProductAddedContext ProductId is invalid.");
         }
     }

@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AzureProcessor.Migrations
 {
     [DbContext(typeof(ProductDbContext))]
-    [Migration("20210830110956_SagaDbInit")]
+    [Migration("20210830112918_SagaDbInit")]
     partial class SagaDbInit
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -21,25 +21,6 @@ namespace AzureProcessor.Migrations
                 .HasAnnotation("ProductVersion", "5.0.9")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("Contracts.Dtos.ProductDto", b =>
-                {
-                    b.Property<int>("Id")
-                        .HasColumnType("int");
-
-                    b.Property<int>("InitialOnHand")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ProductName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("ProductStatus")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ProductDto");
-                });
-
             modelBuilder.Entity("Contracts.StateMachines.ProductState", b =>
                 {
                     b.Property<Guid>("CorrelationId")
@@ -49,7 +30,16 @@ namespace AzureProcessor.Migrations
                         .HasMaxLength(64)
                         .HasColumnType("nvarchar(64)");
 
-                    b.Property<int?>("ProductId")
+                    b.Property<int>("InitialOnHand")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ProductName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ProductStatus")
                         .HasColumnType("int");
 
                     b.Property<int>("Version")
@@ -57,18 +47,7 @@ namespace AzureProcessor.Migrations
 
                     b.HasKey("CorrelationId");
 
-                    b.HasIndex("ProductId");
-
                     b.ToTable("ProductState");
-                });
-
-            modelBuilder.Entity("Contracts.StateMachines.ProductState", b =>
-                {
-                    b.HasOne("Contracts.Dtos.ProductDto", "Product")
-                        .WithMany()
-                        .HasForeignKey("ProductId");
-
-                    b.Navigation("Product");
                 });
 #pragma warning restore 612, 618
         }

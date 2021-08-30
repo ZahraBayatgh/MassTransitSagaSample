@@ -1,4 +1,4 @@
-﻿using Contracts.Dtos;
+﻿using Contracts.Data;
 using Contracts.Events;
 using CSharpFunctionalExtensions;
 using MassTransit;
@@ -34,19 +34,15 @@ namespace ProductCatalogService.Services
 
                 if (createProductResponse.IsSuccess)
                 {
-                    ProductDto productDto = new ProductDto
-                    {
-                        Id = createProductResponse.Value.ProductId,
-                        InitialOnHand = createProductRequestDto.InitialHand,
-                        ProductName = createProductRequestDto.Name,
-                        ProductStatus = ProductStatus.Pending
-                    };
                     // Publish CreateProductIntegrationEvent
                     var bus = CreateBust();
                     await bus.Publish<IProductAddedEvent>(new
                     {
                         CorrelationId = Guid.NewGuid(),
-                        Product = productDto
+                        ProductId = createProductResponse.Value.ProductId,
+                        InitialOnHand = createProductRequestDto.InitialHand,
+                        ProductName = createProductRequestDto.Name,
+                        ProductStatus = ProductStatus.Pending
                     });
 
                     transaction.Commit();

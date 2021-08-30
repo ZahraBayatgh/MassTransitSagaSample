@@ -1,4 +1,4 @@
-﻿using Contracts.Dtos;
+﻿using Contracts.Data;
 using Contracts.Events;
 using MassTransit;
 using Microsoft.Extensions.Logging;
@@ -30,8 +30,8 @@ namespace SalesService.Consumers
                 // Create product
                 var createProductRequestDto = new CreateProductRequestDto
                 {
-                    Name = context.Message.Product.ProductName,
-                    Count = context.Message.Product.InitialOnHand
+                    Name = context.Message.ProductName,
+                    Count = context.Message.InitialOnHand
                 };
                 var createProductResponce = await _productService.CreateProductAsync(createProductRequestDto);
 
@@ -46,7 +46,7 @@ namespace SalesService.Consumers
             }
             catch (Exception ex)
             {
-                _logger.LogInformation($"Product {context.Message.Product.ProductName} wan not created. Exception detail:{ex.Message}");
+                _logger.LogInformation($"Product {context.Message.ProductName} wan not created. Exception detail:{ex.Message}");
 
                 await PublishResult(context, false);
 
@@ -58,12 +58,15 @@ namespace SalesService.Consumers
         private async Task PublishResult(ConsumeContext<ICreateSalesProductCommand> context, bool createProductStatus)
         {
             if (createProductStatus)
-                context.Message.Product.ProductStatus = ProductStatus.SalesIsOk;
+                context.Message.ProductStatus = ProductStatus.SalesIsOk;
 
             await context.Publish<ISalesProductAddedEvent>(new
             {
                 CorrelationId = context.Message.CorrelationId,
-                Product = context.Message.Product
+                ProductId = context.Message.ProductId,
+                ProductName = context.Message.ProductName,
+                InitialOnHand = context.Message.InitialOnHand,
+                ProductStatus = context.Message.ProductStatus
             });
         }
 
@@ -72,10 +75,10 @@ namespace SalesService.Consumers
             if (context == null)
                 throw new ArgumentNullException("CreateSalesProduct is null.");
 
-            if (context.Message.Product.Id <= 0)
+            if (context.Message.ProductId <= 0)
                 throw new ArgumentNullException("CreateSalesProduct ProductId is invalid.");
 
-            if (string.IsNullOrEmpty(context.Message.Product.ProductName))
+            if (string.IsNullOrEmpty(context.Message.ProductName))
                 throw new ArgumentNullException("CreateSalesProduct ProductName is null.");
         }
     }
