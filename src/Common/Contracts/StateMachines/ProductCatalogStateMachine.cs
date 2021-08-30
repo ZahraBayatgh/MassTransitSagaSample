@@ -25,9 +25,9 @@ namespace Contracts.StateMachines
                 During(SalesSubmited, SetSalesProductAddedHandler());
                 During(InventorySubmited, SetInventoryAddedHandler());
                 During(Completed, SetInventoryAddedHandler(),
-                     SetProductRejectedHandler());
+                 SetProductRejectedHandler());
 
-                SetCompletedWhenFinalized();
+            SetCompletedWhenFinalized();
 
         }
         private EventActivityBinder<ProductCatalogState, IProductCatalogAdded> SetProductCatalogAddedHandler() =>

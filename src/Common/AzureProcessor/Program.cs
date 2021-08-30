@@ -1,3 +1,4 @@
+using AzureProcessor.Maps;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -13,6 +14,7 @@ namespace AzureProcessor
     {
         public static void Main(string[] args)
         {
+            SeedData.Seed();
             CreateHostBuilder(args).Build().Run();
         }
 
